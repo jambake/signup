@@ -38,116 +38,89 @@ def valid_email(email):
     return not email or EMAIL_RE.match(email)
 
 
+form = """
+<form method="post">
+    <table>
+        <tr>
+            <th>Username</th>
+            <td>
+                <input name="username" type="text" value="{0}">
+            </td>
+            <td>{1}</td>
+        </tr>
+        <tr>
+            <th>Password</th>
+            <td>
+                <input name="password" type="password">
+            </td>
+            <td>{2}</td>
+        </tr>
+        <tr>
+            <th>Verify Password</th>
+            <td>
+                <input name="verify" type="password">
+            </td>
+            <td>{3}</td>
+        </tr>
+        <tr>
+            <th>Email (optional)</th>
+            <td>
+                <input name="email" type="email" value="{4}">
+            </td>
+            <td>{5}</td>
+        </tr>
+    </table>
+    <input type="submit">
+</form>
+"""
+
 class MainHandler(webapp2.RequestHandler):
 
     def get(self):
 
-        form="""
-        <form method="post">
-            <table style="width:50%">
-                <tr>
-                    <td>Username</td>
-                    <td>
-                        <input name="username" type="text">
-                    </td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td>Password</td>
-                    <td>
-                        <input name="password" type="password">
-                    </td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td>Verify Password</td>
-                    <td>
-                        <input name="verify" type="password">
-                    </td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td>Email (optional)</td>
-                    <td>
-                        <input name="email" type="email">
-                    </td>
-                    <td></td>
-                </tr>
-            </table>
-            <input type="submit">
-        </form>
-        """
-
-        response = page_header + form + page_footer
+        temp = ""
+        response = page_header + form.format(temp, temp, temp, temp, temp, temp) + page_footer
         self.response.write(response)
 
-
     def post(self):
-
-        username = self.request.get('username')
-        password = self.request.get('password')
-        verify = self.request.get('verify')
-        email = self.request.get('email')
+        has_error = False
+        user_name = self.request.get("username")
+        pass_word = self.request.get("password")
+        verify_pass = self.request.get("verify")
+        user_email = self.request.get("email")
         error1 = ""
         error2 = ""
         error3 = ""
         error4 = ""
 
-        if not valid_username(username):
+        if not valid_username(user_name):
             error1 = "That's not a valid username."
-
-        if not valid_password(password):
+            has_error = True
+        if not valid_password(pass_word):
             error2 = "That wasn't a valid password."
-
-        if not password == verify:
+            has_error = True
+        if not pass_word == verify_pass:
             error3 = "Your passwords didn't match."
-
-        if not valid_email(email):
+            has_error = True
+        if not valid_email(user_email):
             error4 = "That's not a valid email."
+            has_error = True
 
-        form="""
-        <form method="post">
-            <table style="width:50%">
-                <tr>
-                    <td>Username</td>
-                    <td>
-                        <input name="username" type="text">
-                    </td>
-                    <td>%s</td>
-                </tr>
-                <tr>
-                    <td>Password</td>
-                    <td>
-                        <input name="password" type="password">
-                    </td>
-                    <td>%s</td>
-                </tr>
-                <tr>
-                    <td>Verify Password</td>
-                    <td>
-                        <input name="verify" type="password">
-                    </td>
-                    <td>%s</td>
-                </tr>
-                <tr>
-                    <td>Email (optional)</td>
-                    <td>
-                        <input name="email" type="email">
-                    </td>
-                    <td>%s</td>
-                </tr>
-            </table>
-            <input type="submit">
-        </form>
-        """ % (error1, error2, error3, error4)
+        if has_error:
+            response = page_header + form.format(user_name, error1, error2, error3, user_email, error4) + page_footer
+            self.response.write(response)
+        else:
+            self.redirect('/welcome?username=%s' % user_name)
 
+class WelcomePage(webapp2.RequestHandler):
 
-        response = page_header + form + page_footer
+    def get(self):
+        username = self.request.get("username")
+        response = "Welcome, " + username + "!"
         self.response.write(response)
 
 
-
-
 app = webapp2.WSGIApplication([
-    ('/', MainHandler)
+    ('/', MainHandler),
+    ('/welcome', WelcomePage)
 ], debug=True)
