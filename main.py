@@ -46,28 +46,28 @@ form = """
             <td>
                 <input name="username" type="text" value="{0}">
             </td>
-            <td>{1}</td>
+            <td class="error">{1}</td>
         </tr>
         <tr>
             <th>Password</th>
             <td>
                 <input name="password" type="password">
             </td>
-            <td>{2}</td>
+            <td class="error">{2}</td>
         </tr>
         <tr>
             <th>Verify Password</th>
             <td>
                 <input name="verify" type="password">
             </td>
-            <td>{3}</td>
+            <td class="error">{3}</td>
         </tr>
         <tr>
             <th>Email (optional)</th>
             <td>
                 <input name="email" type="email" value="{4}">
             </td>
-            <td>{5}</td>
+            <td class="error">{5}</td>
         </tr>
     </table>
     <input type="submit">
